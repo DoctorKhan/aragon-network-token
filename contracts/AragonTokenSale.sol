@@ -162,28 +162,30 @@ Price increases by the same delta in every stage change
   function getPrice(uint _blockNumber) constant public returns (uint256) {
     if (_blockNumber < initialBlock || _blockNumber >= finalBlock) return 0;
 
-    return priceForStage(stageForBlock(_blockNumber));
+    return priceForBlock(_blockNumber);
   }
 
-  // @notice Get what the stage is for a given blockNumber
-  // @param _blockNumber: Block number
-  // @return The sale stage for that block. Stage is between 0 and (priceStages - 1)
-  function stageForBlock(uint _blockNumber) constant internal returns (uint8) {
-    uint blockN = safeSub(_blockNumber, initialBlock);
-    uint totalBlocks = safeSub(finalBlock, initialBlock);
-
-    return uint8(safeDiv(safeMul(priceStages, blockN), totalBlocks));
-  }
-
-  // @notice Get what the price is for a given stage
+   // @notice Get what the price is for a given stage
   // @param _stage: Stage number
   // @return Price in wei for that stage.
   // If sale stage doesn't exist, returns 0.
-  function priceForStage(uint8 _stage) constant internal returns (uint256) {
-    if (_stage >= priceStages) return 0;
-    uint priceDifference = safeSub(initialPrice, finalPrice);
-    uint stageDelta = safeDiv(priceDifference, uint(priceStages - 1));
-    return safeSub(initialPrice, safeMul(uint256(_stage), stageDelta));
+  function priceForBlock(uint _block) constant internal returns (uint256) {
+    // TODO if (_block >= priceStages) return 0;
+    // uint priceDifference = safeSub(initialPrice, finalPrice);
+    // uint stageDelta = safeDiv(priceDifference, uint(priceStages - 1));
+    // return safeSub(initialPrice, safeMul(uint256(_stage), stageDelta));
+    
+    // N * e ^ (- lam * t)
+    uint localBlock = _block - startBlock;
+    uint lam = 3;
+    uint N = 4;
+
+    //e ** x;
+    //N * 2 ** (-1 * lam * localBlock);
+    // uint y = 24 - 24 * x + 12 * x ** 2 - 4 * x ** 3 + x ** 4;
+
+
+    return _block;
   }
 
   // @notice Aragon Dev needs to make initial token allocations for presale partners
@@ -265,13 +267,13 @@ Price increases by the same delta in every stage change
 
     if (totalCollected + msg.value > hardCap) throw; // If past hard cap, throw
 
-    uint256 boughtTokens = safeMul(msg.value, getPrice(getBlockNumber())); // Calculate how many tokens bought
-
     if (!saleWallet.send(msg.value)) throw; // Send funds to multisig
-    if (!token.generateTokens(_owner, boughtTokens)) throw; // Allocate tokens. This will fail after sale is finalized in case it is hidden cap finalized.
+    eth4tokens[_owner] = msg.value;
+
 
     totalCollected = safeAdd(totalCollected, msg.value); // Save total collected amount
 
+    // TODO update boughtTokens per stage to reflect changes in price
     NewBuyer(_owner, boughtTokens, msg.value);
   }
 
@@ -321,6 +323,39 @@ Price increases by the same delta in every stage change
            public {
 
     doFinalizeSale(_cap, _cap_secure);
+    finalPrice = getPrice(getBlockNumber());
+  }
+
+
+  // for loop with bounded number of looping
+  uint public finalPrice;
+  uint private distributeFunds_state = 0;
+  IndexedAddressSet contributors;
+  mapping (address => uint) contributorAmount; // Amount contributed ether
+  function distributeTokens(uint count) {
+    if (!finalized) throw;
+
+    uint lastContribIndex = distributeFunds_state + count;
+    uint contribIndex;
+    address _owner;
+    uint etherDontated;
+    uint boughtTokens;
+
+    for (contribIndex = distributeFunds_state; contribIndex < lastContribIndex && contribIndex < contributors.length; contribIndex++) {
+      _owner = contributors.get(contribIndex);
+      etherDonated = contributorAmount(_owner);
+      boughtTokens = safeMul(etherDonated, finalPrice); // Calculate how many tokens bought
+
+      if (!token.generateTokens(_owner, boughtTokens)) throw; // Allocate tokens. This will fail after sale is finalized in case it is hidden cap finalized.
+    }
+    distributeFunds_state = contribIndex;
+
+    if (contribIndex >= contributors.length) {
+      // Aragon Dev owns 30% of the total number of emitted tokens at the end of the sale.
+      uint256 aragonTokens = token.totalSupply() * 3 / 7;
+      if (!token.generateTokens(aragonDevMultisig, aragonTokens)) throw;
+      token.changeController(networkPlaceholder); // Sale loses token controller power in favor of network placeholder
+    }
   }
 
   function doFinalizeSale(uint256 _cap, uint256 _cap_secure)
@@ -330,11 +365,11 @@ Price increases by the same delta in every stage change
     // This function cannot be successfully called twice, because it will top being the controller,
     // and the generateTokens call will fail if called again.
 
-    // Aragon Dev owns 30% of the total number of emitted tokens at the end of the sale.
-    uint256 aragonTokens = token.totalSupply() * 3 / 7;
-    if (!token.generateTokens(aragonDevMultisig, aragonTokens)) throw;
-    token.changeController(networkPlaceholder); // Sale loses token controller power in favor of network placeholder
+    // Generate the tokens
 
+    // Iterate over owners
+
+    
     saleFinalized = true;  // Set stop is true which will enable network deployment
     saleStopped = true;
   }
