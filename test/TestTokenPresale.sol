@@ -9,7 +9,7 @@ import "./helpers/MultisigMock.sol";
 contract TestTokenPresale {
   uint public initialBalance = 200 finney;
 
-  ANT token;
+  BEE token;
 
   ThrowProxy throwProxy;
 
@@ -18,7 +18,7 @@ contract TestTokenPresale {
   }
 
   function deployAndSetANT(AragonTokenSale sale) {
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
     a.setCanCreateGrants(sale, true);
     sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), address(sale)));
@@ -49,7 +49,7 @@ contract TestTokenPresale {
 
   function testCannotActivateBeforeDeployingANT() {
     TestTokenPresale(throwProxy).throwsWhenActivatingBeforeDeployingANT();
-    throwProxy.assertThrows("Should have thrown when activating before deploying ANT");
+    throwProxy.assertThrows("Should have thrown when activating before deploying BEE");
   }
 
   function throwsWhenActivatingBeforeDeployingANT() {
@@ -59,7 +59,7 @@ contract TestTokenPresale {
 
   function testCannotRedeployANT() {
     TestTokenPresale(throwProxy).throwsWhenRedeployingANT();
-    throwProxy.assertThrows("Should have thrown when redeploying ANT");
+    throwProxy.assertThrows("Should have thrown when redeploying BEE");
   }
 
   function throwsWhenRedeployingANT() {
@@ -70,7 +70,7 @@ contract TestTokenPresale {
 
   function testOnlyMultisigCanDeployANT() {
     TestTokenPresale(throwProxy).throwsWhenNonMultisigDeploysANT();
-    throwProxy.assertThrows("Should have thrown when deploying ANT from not multisig");
+    throwProxy.assertThrows("Should have thrown when deploying BEE from not multisig");
   }
 
   function throwsWhenNonMultisigDeploysANT() {
@@ -85,7 +85,7 @@ contract TestTokenPresale {
 
   function throwsWhenNetworkPlaceholderIsBad() {
     AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
     sale.setANT(a, new ANPlaceholder(address(sale), address(sale)), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), address(sale))); // should be initialized with token address
   }
@@ -97,7 +97,7 @@ contract TestTokenPresale {
 
   function throwsWhenSaleIsNotTokenController() {
     AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BEE a = new BEE(new MiniMeTokenFactory());
     // Not called a.changeController(sale);
     sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), address(sale))); // should be initialized with token address
   }
@@ -109,7 +109,7 @@ contract TestTokenPresale {
 
   function throwsSaleWalletIncorrectBlock() {
     AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
     sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock() - 1, address(sale)));
   }
@@ -121,7 +121,7 @@ contract TestTokenPresale {
 
   function throwsSaleWalletIncorrectMultisig() {
     AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
     sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(0x1a77ed, sale.finalBlock(), address(sale)));
   }
@@ -133,7 +133,7 @@ contract TestTokenPresale {
 
   function throwsSaleWalletIncorrectSaleAddress() {
     AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
     sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), 0xdead));
   }

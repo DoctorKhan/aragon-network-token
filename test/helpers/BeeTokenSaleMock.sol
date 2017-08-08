@@ -1,12 +1,12 @@
 pragma solidity ^0.4.8;
 
-import '../../contracts/AragonTokenSale.sol';
+import '../../contracts/BeeTokenSale.sol';
 
-// @dev AragonTokenSaleMock mocks current block number
+// @dev BeeTokenSaleMock mocks current block number
 
-contract AragonTokenSaleMock is AragonTokenSale {
+contract BeeTokenSaleMock is BeeTokenSale {
 
-  function AragonTokenSaleMock (
+  function BeeTokenSaleMock (
       uint _initialBlock,
       uint _finalBlock,
       address _aragonDevMultisig,
@@ -14,7 +14,7 @@ contract AragonTokenSaleMock is AragonTokenSale {
       uint256 _initialPrice,
       uint256 _finalPrice,
       uint8 _priceStages
-  ) AragonTokenSale(_initialBlock, _finalBlock, _aragonDevMultisig, _communityMultisig, _initialPrice, _finalPrice, _priceStages, computeCap(mock_hiddenCap, mock_capSecret)) {
+  ) BeeTokenSale(_initialBlock, _finalBlock, _aragonDevMultisig, _communityMultisig, _initialPrice, _finalPrice, _priceStages, computeCap(mock_hiddenCap, mock_capSecret)) {
 
   }
 

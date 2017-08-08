@@ -1,7 +1,7 @@
 var AragonTokenSale = artifacts.require("AragonTokenSale");
 var MiniMeTokenFactory = artifacts.require("MiniMeTokenFactory");
 var ANPlaceholder = artifacts.require("ANPlaceholder");
-var ANT = artifacts.require("ANT");
+var BEE = artifacts.require("BEE");
 var SaleWallet = artifacts.require("SaleWallet");
 
 
@@ -24,10 +24,10 @@ module.exports = function(deployer, network, accounts) {
         })
         .then(s => {
           sale = s
-          return ANT.new(factory.address)
+          return BEE.new(factory.address)
         }).then(a => {
           ant = a
-          console.log('ANT:', ant.address)
+          console.log('BEE:', ant.address)
           return ant.changeController(sale.address)
         })
         .then(() => {
@@ -49,7 +49,7 @@ module.exports = function(deployer, network, accounts) {
           if (aragonMs != accounts[0]) {
             console.log(sale.setANT.request(ant.address, networkPlaceholder.address, wallet.address))
           } else {
-            console.log('Test mode, setting ANT')
+            console.log('Test mode, setting BEE')
             return sale.setANT(ant.address, networkPlaceholder.address, wallet.address)
           }
         })

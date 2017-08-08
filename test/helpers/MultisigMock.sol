@@ -4,7 +4,7 @@ import './AragonTokenSaleMock.sol';
 
 contract MultisigMock {
   function deployAndSetANT(address sale) {
-    ANT token = new ANT(new MiniMeTokenFactory());
+    BEE token = new BEE(new MiniMeTokenFactory());
     ANPlaceholder networkPlaceholder = new ANPlaceholder(sale, token);
     token.changeController(address(sale));
 

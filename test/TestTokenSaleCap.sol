@@ -130,14 +130,14 @@ contract TestTokenSaleCap {
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), address(sale), "Sale is controller during sale");
+    Assert.equal(BEE(sale.token()).controller(), address(sale), "Sale is controller during sale");
 
     sale.setMockedBlockNumber(12);
     sale.proxyPayment.value(15 finney)(address(this));
     sale.setMockedBlockNumber(22);
     ms.finalizeSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), sale.networkPlaceholder(), "Network placeholder is controller after sale");
+    Assert.equal(BEE(sale.token()).controller(), sale.networkPlaceholder(), "Network placeholder is controller after sale");
 
     ERC20(sale.token()).transfer(0x1, 10 finney);
     Assert.equal(ERC20(sale.token()).balanceOf(0x1), 10 finney, 'Should have correct balance after receiving tokens');
@@ -149,7 +149,7 @@ contract TestTokenSaleCap {
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), address(sale), "Sale is controller during sale");
+    Assert.equal(BEE(sale.token()).controller(), address(sale), "Sale is controller during sale");
 
     sale.setMockedBlockNumber(1000000);
     sale.proxyPayment.value(15 finney)(address(this));
@@ -167,7 +167,7 @@ contract TestTokenSaleCap {
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), address(sale), "Sale is controller during sale");
+    Assert.equal(BEE(sale.token()).controller(), address(sale), "Sale is controller during sale");
 
     sale.setMockedBlockNumber(1000000);
     sale.proxyPayment.value(15 finney)(address(this));

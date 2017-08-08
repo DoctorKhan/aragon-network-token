@@ -1,15 +1,15 @@
 pragma solidity ^0.4.8;
 
-import './AragonTokenSaleMock.sol';
+import './BeeTokenSaleMock.sol';
 
-// @dev AragonTokenSaleTokenMock for ERC20 tests purpose.
+// @dev BeeTokenSaleTokenMock for ERC20 tests purpose.
 // As it also deploys MiniMeTokenFactory, nonce will increase and therefore will be broken for future deployments
 
-contract AragonTokenSaleTokenMock is AragonTokenSaleMock {
-  function AragonTokenSaleTokenMock(address initialAccount, uint initialBalance)
-    AragonTokenSaleMock(10, 20, msg.sender, msg.sender, 100, 50, 2)
+contract BeeTokenSaleTokenMock is BeeTokenSaleMock {
+  function BeeTokenSaleTokenMock(address initialAccount, uint initialBalance)
+    BeeTokenSaleMock(10, 20, msg.sender, msg.sender, 100, 50, 2)
     {
-      ANT token = new ANT(new MiniMeTokenFactory());
+      BEE token = new BEE(new MiniMeTokenFactory());
       ANPlaceholder networkPlaceholder = new ANPlaceholder(this, token);
       token.changeController(address(this));
 

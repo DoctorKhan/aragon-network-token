@@ -1,28 +1,28 @@
 pragma solidity ^0.4.8;
 
 import "./interface/Controller.sol";
-import "./ANT.sol";
+import "./BEE.sol";
 
 /*
     Copyright 2017, Jorge Izquierdo (Aragon Foundation)
 */
 /*
 
-@notice The ANPlaceholder contract will take control over the ANT after the sale
+@notice The ANPlaceholder contract will take control over the BEE after the sale
         is finalized and before the Aragon Network is deployed.
 
-        The contract allows for ANT transfers and transferFrom and implements the
+        The contract allows for BEE transfers and transferFrom and implements the
         logic for transfering control of the token to the network when the sale
         asks it to do so.
 */
 
 contract ANPlaceholder is Controller {
   address public sale;
-  ANT public token;
+  BEE public token;
 
-  function ANPlaceholder(address _sale, address _ant) {
+  function ANPlaceholder(address _sale, address _bee) {
     sale = _sale;
-    token = ANT(_ant);
+    token = BEE(_bee);
   }
 
   function changeController(address network) public {

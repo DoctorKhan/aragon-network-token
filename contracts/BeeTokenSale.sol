@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 import "zeppelin/SafeMath.sol";
 import "./interface/Controller.sol";
-import "./ANT.sol";
+import "./BEE.sol";
 import "./ANPlaceholder.sol";
 import "./SaleWallet.sol";
 
@@ -16,8 +16,8 @@ import "./SaleWallet.sol";
 contract AragonTokenSale is Controller, SafeMath {
     uint public initialBlock;             // Block number in which the sale starts. Inclusive. sale will be opened at initial block.
     uint public finalBlock;               // Block number in which the sale end. Exclusive, sale will be closed at ends block.
-    uint public initialPrice;             // Number of wei-ANT tokens for 1 wei, at the start of the sale (18 decimals)
-    uint public finalPrice;               // Number of wei-ANT tokens for 1 wei, at the end of the sale
+    uint public initialPrice;             // Number of wei-BEE tokens for 1 wei, at the start of the sale (18 decimals)
+    uint public finalPrice;               // Number of wei-BEE tokens for 1 wei, at the end of the sale
     uint8 public priceStages;             // Number of different price stages for interpolating between initialPrice and finalPrice
     address public aragonDevMultisig;     // The address to hold the funds donated
     address public communityMultisig;     // Community trusted multisig to deploy network
@@ -29,7 +29,7 @@ contract AragonTokenSale is Controller, SafeMath {
 
     mapping (address => bool) public activated;   // Address confirmates that wants to activate the sale
 
-    ANT public token;                             // The token
+    BEE public token;                             // The token
     ANPlaceholder public networkPlaceholder;      // The network placeholder
     SaleWallet public saleWallet;                    // Wallet that receives all sale funds
 
@@ -44,8 +44,8 @@ contract AragonTokenSale is Controller, SafeMath {
 /// @param _finalBlock The Block number in which the sale ends
 /// @param _aragonDevMultisig The address that will store the donated funds and manager
 /// for the sale
-/// @param _initialPrice The price for the first stage of the sale. Price in wei-ANT per wei.
-/// @param _finalPrice The price for the final stage of the sale. Price in wei-ANT per wei.
+/// @param _initialPrice The price for the first stage of the sale. Price in wei-BEE per wei.
+/// @param _finalPrice The price for the final stage of the sale. Price in wei-BEE per wei.
 /// @param _priceStages The number of price stages. The price for every middle stage
 /// will be linearly interpolated.
 /*
@@ -103,12 +103,12 @@ Price increases by the same delta in every stage change
       capCommitment = _capCommitment;
   }
 
-  // @notice Deploy ANT is called only once to setup all the needed contracts.
-  // @param _token: Address of an instance of the ANT token
+  // @notice Deploy BEE is called only once to setup all the needed contracts.
+  // @param _token: Address of an instance of the BEE token
   // @param _networkPlaceholder: Address of an instance of ANPlaceholder
   // @param _saleWallet: Address of the wallet receiving the funds of the sale
 
-  function setANT(address _token, address _networkPlaceholder, address _saleWallet)
+  function setBEE(address _token, address _networkPlaceholder, address _saleWallet)
            non_zero_address(_token)
            non_zero_address(_networkPlaceholder)
            non_zero_address(_saleWallet)
@@ -118,13 +118,13 @@ Price increases by the same delta in every stage change
     // Assert that the function hasn't been called before, as activate will happen at the end
     if (activated[this]) throw;
 
-    token = ANT(_token);
+    token = BEE(_token);
     networkPlaceholder = ANPlaceholder(_networkPlaceholder);
     saleWallet = SaleWallet(_saleWallet);
 
     if (token.controller() != address(this)) throw; // sale is controller
     if (networkPlaceholder.sale() != address(this)) throw; // placeholder has reference to Sale
-    if (networkPlaceholder.token() != address(token)) throw; // placeholder has reference to ANT
+    if (networkPlaceholder.token() != address(token)) throw; // placeholder has reference to BEE
     if (token.totalSupply() > 0) throw; // token is empty
     if (saleWallet.finalBlock() != finalBlock) throw; // final blocks must match
     if (saleWallet.multisig() != aragonDevMultisig) throw; // receiving wallet must match
@@ -155,9 +155,9 @@ Price increases by the same delta in every stage change
     return activated[this] && activated[aragonDevMultisig] && activated[communityMultisig];
   }
 
-  // @notice Get the price for a ANT token at any given block number
+  // @notice Get the price for a BEE token at any given block number
   // @param _blockNumber the block for which the price is requested
-  // @return Number of wei-ANT for 1 wei
+  // @return Number of wei-BEE for 1 wei
   // If sale isn't ongoing for that block, returns 0.
   function getPrice(uint _blockNumber) constant public returns (uint256) {
     if (_blockNumber < initialBlock || _blockNumber >= finalBlock) return 0;
@@ -200,7 +200,7 @@ Price increases by the same delta in every stage change
            only(aragonDevMultisig)
            public {
 
-    if (_amount > 10 ** 24) throw; // 1 million ANT. No presale partner will have more than this allocated. Prevent overflows.
+    if (_amount > 10 ** 24) throw; // 1 million BEE. No presale partner will have more than this allocated. Prevent overflows.
 
     if (!token.generateTokens(address(this), _amount)) throw;
     token.grantVestedTokens(_receiver, _amount, uint64(now), cliffDate, vestingDate);
