@@ -43,14 +43,16 @@ class App extends Component {
       const communityMs = accounts[1];
       const tokenAddr = token.address();  // BEE token
       const networkPlaceholderAddr = .address();  // BEEPlaceholder
-      const saleWaleAddr = .address();  // SaleWallet
+      const saleWalletAddr = .address();  // SaleWallet
 
-      tokenSale.activateSale({from: aragonMs});      // Setup aragon multisig
-      tokenSale.activateSale({from: communityMs});   // Setup community multisig
-      
-      tokenSale.setAnt( tokenAddr                    // Final sale approval
-                      , networkPlaceholderAddr, saleWaleAddr, {from: aragonMs});
-      
+      await tokenSale.activateSale({from: aragonMs});      // Setup aragon multisig
+      await tokenSale.activateSale({from: communityMs});   // Setup community multisig
+
+      await tokenSale.setAnt( tokenAddr                    // Final sale approval
+                            , networkPlaceholderAddr, saleWalletAddr, {from: aragonMs});
+
+      let active = await tokenSale.isActivated();
+      console.log('sale is ' + (active?'':'not ') + 'approved!');
     })
     
   }

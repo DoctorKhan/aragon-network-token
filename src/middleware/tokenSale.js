@@ -1,6 +1,6 @@
 import Web3 from 'web3'
 import { default as contract } from 'truffle-contract'
-import tokenSale_artifacts from '../../build/contracts/AragonTokenSale.json'
+import tokenSale_artifacts from '../../build/contracts/BeeTokenSale.json'
 
 var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 var TokenSale = contract(tokenSale_artifacts);
@@ -11,30 +11,82 @@ export const getAddress = async () => {
     let ts = await TokenSale.deployed();
     return ts.address;
   } catch (err) {
-    return 'Not Deployed';
+    return 'in getAddress .. Not Deployed';
   }
-}
-
-
-export const activateSale = async (txParams) => {
-  let ts = await TokenSale.deployed()
-  let result = await ts.activateSale(txParams);
-
-  console.log(`result: ${result}`)
-  return result
 }
 
 export const getBalance = async (address) => {
   try {
-    let ts     = await TokenSale.deployed()
-    let balance = await ts.balanceOf.call(address)
+    let ts     = await TokenSale.deployed();
+    let balance = await ts.balanceOf.call(address);
 
-    return balance.toNumber()
+    return balance.toNumber();
   } catch (err) {
-    return 'Not Deployed'
+    return 'in getBalance .. Not Deployed';
   }
 }
 
+export const activateSale = async (txParams) => {
+  try {
+    let ts = await TokenSale.deployed();
+    let result = await ts.activateSale(txParams);
+
+    console.log(`result: ${result}`);
+    return result;
+  } catch (err) {
+    return 'in activateSale .. error';
+  }
+}
+
+export const setAnt = async (tokenAddr, networkPlaceholderAddr, salWalletAddr, txParams) => {
+  try {
+    let ts = await TokenSale.deployed();
+    let result = await ts.setAnt(tokenAddr, networkPlaceholderAddr, salWalletAddr, txParams);
+
+    console.log(`result: ${result}`);
+    return result;
+  } catch (err) {
+    return 'in setAnt .. error';
+  }
+}
+
+export const isActivated = async () => {
+  try {
+    let ts = await TokenSale.deployed();
+    let result = await ts.isActivated();
+
+    console.log(`result: ${result}`);
+    return result
+  } catch (err) {
+    return 'in setAnt .. error';
+  }
+}
+
+/*
+export const allocatePresaleTokens = async (receiver, amount, cliffDate, vestingDate) => {
+  try {
+    let ts = await TokenSale.deployed();
+    let result = await ts.allocatePresaleTokens(receiver, amount, cliffDate, vestingDate);
+
+    console.log(`result: ${result}`);
+    return result;
+  } catch (err) {
+    return 'in getPrice .. error';
+  }  
+
+}
+*/
+export const getPrice = async (blockNumber) => {
+  try {
+    let ts = await TokenSale.deployed();
+    let result = await ts.getPrice(blockNumber);
+
+    console.log(`result: ${result}`);
+    return result;
+  } catch (err) {
+    return 'in getPrice .. error';
+  }  
+}
 
 /*
   function AragonTokenSale (
