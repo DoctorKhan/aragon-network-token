@@ -1,12 +1,12 @@
 pragma solidity ^0.4.8;
 
 import "truffle/Assert.sol";
-import '../contracts/ANT.sol';
+import '../contracts/BEE.sol';
 import '../contracts/MiniMeToken.sol';
 
 contract TestMiniMeCloning {
   MiniMeTokenFactory factory;
-  ANT token;
+  BEE token;
   MiniMeToken clone1;
   MiniMeToken clone2;
 
@@ -14,7 +14,7 @@ contract TestMiniMeCloning {
 
   function beforeAll() {
     factory = new MiniMeTokenFactory();
-    token = new ANT(factory);
+    token = new BEE(factory);
     token.generateTokens(this, 100);
     token.changeController(0xbeef); // so it doesn't ask this for callbacks
     baseBlock = block.number;

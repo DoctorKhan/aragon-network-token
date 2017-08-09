@@ -6,9 +6,9 @@ import "./MiniMeIrrevocableVestedToken.sol";
     Copyright 2017, Jorge Izquierdo (Aragon Foundation)
 */
 
-contract ANT is MiniMeIrrevocableVestedToken {
-  // @dev ANT constructor just parametrizes the MiniMeIrrevocableVestedToken constructor
-  function ANT(
+contract BEE is MiniMeIrrevocableVestedToken {
+  // @dev BEE constructor just parametrizes the MiniMeIrrevocableVestedToken constructor
+  function BEE(
     address _tokenFactory
   ) MiniMeIrrevocableVestedToken(
     _tokenFactory,
@@ -16,7 +16,7 @@ contract ANT is MiniMeIrrevocableVestedToken {
     0,                      // no snapshot block number from parent
     "Aragon Network Token", // Token name
     18,                     // Decimals
-    "ANT",                  // Symbol
+    "BEE",                  // Symbol
     true                    // Enable transfers
     ) {}
 }

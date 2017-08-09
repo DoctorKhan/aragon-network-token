@@ -1,44 +1,44 @@
 pragma solidity ^0.4.8;
 
-import './AragonTokenSaleMock.sol';
+import './BeeTokenSaleMock.sol';
 
 contract MultisigMock {
   function deployAndSetANT(address sale) {
-    ANT token = new ANT(new MiniMeTokenFactory());
+    BEE token = new BEE(new MiniMeTokenFactory());
     ANPlaceholder networkPlaceholder = new ANPlaceholder(sale, token);
     token.changeController(address(sale));
 
-    AragonTokenSale s = AragonTokenSale(sale);
+    BeeTokenSale s = BeeTokenSale(sale);
     token.setCanCreateGrants(sale, true);
-    s.setANT(token, networkPlaceholder, new SaleWallet(s.aragonDevMultisig(), s.finalBlock(), sale));
+    s.setANT(token, networkPlaceholder, new SaleWallet(s.BeeDevMultisig(), s.finalBlock(), sale));
   }
 
   function activateSale(address sale) {
-    AragonTokenSale(sale).activateSale();
+    BeeTokenSale(sale).activateSale();
   }
 
   function emergencyStopSale(address sale) {
-    AragonTokenSale(sale).emergencyStopSale();
+    BeeTokenSale(sale).emergencyStopSale();
   }
 
   function restartSale(address sale) {
-    AragonTokenSale(sale).restartSale();
+    BeeTokenSale(sale).restartSale();
   }
 
   function finalizeSale(address sale) {
-    finalizeSale(sale, AragonTokenSaleMock(sale).mock_hiddenCap());
+    finalizeSale(sale, BeeTokenSaleMock(sale).mock_hiddenCap());
   }
 
   function withdrawWallet(address sale) {
-    SaleWallet(AragonTokenSale(sale).saleWallet()).withdraw();
+    SaleWallet(BeeTokenSale(sale).saleWallet()).withdraw();
   }
 
   function finalizeSale(address sale, uint256 cap) {
-    AragonTokenSale(sale).finalizeSale(cap, AragonTokenSaleMock(sale).mock_capSecret());
+    BeeTokenSale(sale).finalizeSale(cap, BeeTokenSaleMock(sale).mock_capSecret());
   }
 
   function deployNetwork(address sale, address network) {
-    AragonTokenSale(sale).deployNetwork(network);
+    BeeTokenSale(sale).deployNetwork(network);
   }
 
   function () payable {}

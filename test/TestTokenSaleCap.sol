@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 import "truffle/Assert.sol";
 import "zeppelin/token/ERC20.sol";
-import "./helpers/AragonTokenSaleMock.sol";
+import "./helpers/BeeTokenSaleMock.sol";
 import "./helpers/ThrowProxy.sol";
 import "./helpers/MultisigMock.sol";
 import "./helpers/NetworkMock.sol";
@@ -29,7 +29,7 @@ contract TestTokenSaleCap {
 
   function throwsWhenFinalizingNotEndedSale() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 3, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
     sale.setMockedBlockNumber(19);
@@ -43,7 +43,7 @@ contract TestTokenSaleCap {
 
   function throwsWhenFinalizingIfNotMultisig() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 3, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
     sale.setMockedBlockNumber(30);
@@ -57,7 +57,7 @@ contract TestTokenSaleCap {
 
   function throwsWhenFinalizingWithIncorrectCap() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
     sale.setMockedBlockNumber(21);
@@ -66,7 +66,7 @@ contract TestTokenSaleCap {
 
   function testCanFinalizeOnCap() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
     sale.setMockedBlockNumber(12);
@@ -79,7 +79,7 @@ contract TestTokenSaleCap {
 
   function testFinalizingBeforeCapChangesHardCap() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
     sale.setMockedBlockNumber(12);
@@ -98,7 +98,7 @@ contract TestTokenSaleCap {
 
   function throwsWhenHittingHardCap() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
     sale.setMockedBlockNumber(12);
@@ -108,7 +108,7 @@ contract TestTokenSaleCap {
 
   function testCanFinalizeEndedSale() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 5, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
     sale.setMockedBlockNumber(12);
@@ -126,18 +126,18 @@ contract TestTokenSaleCap {
 
   function testTokensAreTransferrableAfterSale() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(ms), address(ms), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(ms), address(ms), 3, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), address(sale), "Sale is controller during sale");
+    Assert.equal(BEE(sale.token()).controller(), address(sale), "Sale is controller during sale");
 
     sale.setMockedBlockNumber(12);
     sale.proxyPayment.value(15 finney)(address(this));
     sale.setMockedBlockNumber(22);
     ms.finalizeSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), sale.networkPlaceholder(), "Network placeholder is controller after sale");
+    Assert.equal(BEE(sale.token()).controller(), sale.networkPlaceholder(), "Network placeholder is controller after sale");
 
     ERC20(sale.token()).transfer(0x1, 10 finney);
     Assert.equal(ERC20(sale.token()).balanceOf(0x1), 10 finney, 'Should have correct balance after receiving tokens');
@@ -145,11 +145,11 @@ contract TestTokenSaleCap {
 
   function testFundsAreTransferrableAfterSale() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(1000000, 60000000, address(ms), address(ms), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(1000000, 60000000, address(ms), address(ms), 3, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), address(sale), "Sale is controller during sale");
+    Assert.equal(BEE(sale.token()).controller(), address(sale), "Sale is controller during sale");
 
     sale.setMockedBlockNumber(1000000);
     sale.proxyPayment.value(15 finney)(address(this));
@@ -163,11 +163,11 @@ contract TestTokenSaleCap {
 
   function testFundsAreLockedDuringSale() {
     MultisigMock ms = new MultisigMock();
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(1000000, 60000000, address(ms), address(ms), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(1000000, 60000000, address(ms), address(ms), 3, 1, 2);
     ms.deployAndSetANT(sale);
     ms.activateSale(sale);
 
-    Assert.equal(ANT(sale.token()).controller(), address(sale), "Sale is controller during sale");
+    Assert.equal(BEE(sale.token()).controller(), address(sale), "Sale is controller during sale");
 
     sale.setMockedBlockNumber(1000000);
     sale.proxyPayment.value(15 finney)(address(this));

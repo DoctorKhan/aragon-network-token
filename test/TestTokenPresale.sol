@@ -2,14 +2,14 @@ pragma solidity ^0.4.8;
 
 import "truffle/Assert.sol";
 import "zeppelin/token/ERC20.sol";
-import "./helpers/AragonTokenSaleMock.sol";
+import "./helpers/BeeTokenSaleMock.sol";
 import "./helpers/ThrowProxy.sol";
 import "./helpers/MultisigMock.sol";
 
 contract TestTokenPresale {
   uint public initialBalance = 200 finney;
 
-  ANT token;
+  BEE token;
 
   ThrowProxy throwProxy;
 
@@ -17,15 +17,15 @@ contract TestTokenPresale {
     throwProxy = new ThrowProxy(address(this));
   }
 
-  function deployAndSetANT(AragonTokenSale sale) {
-    ANT a = new ANT(new MiniMeTokenFactory());
+  function deployAndSetANT(BeeTokenSale sale) {
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
     a.setCanCreateGrants(sale, true);
-    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), address(sale)));
+    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.BeeDevMultisig(), sale.finalBlock(), address(sale)));
   }
 
   function testCreateSale() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, 0x1, 0x2, 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, 0x1, 0x2, 3, 1, 2);
 
     Assert.isFalse(sale.isActivated(), "Sale should be activated");
     Assert.equal(sale.totalCollected(), 0, "Should start with 0 funds collected");
@@ -37,11 +37,11 @@ contract TestTokenPresale {
   }
 
   function throwIfStartPastBlocktime() {
-    new AragonTokenSaleMock(0, 20, 0x1, 0x2, 3, 1, 2);
+    new BeeTokenSaleMock(0, 20, 0x1, 0x2, 3, 1, 2);
   }
 
   function testActivateSale() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
     deployAndSetANT(sale);
     sale.activateSale();
     Assert.isTrue(sale.isActivated(), "Should be activated");
@@ -49,32 +49,32 @@ contract TestTokenPresale {
 
   function testCannotActivateBeforeDeployingANT() {
     TestTokenPresale(throwProxy).throwsWhenActivatingBeforeDeployingANT();
-    throwProxy.assertThrows("Should have thrown when activating before deploying ANT");
+    throwProxy.assertThrows("Should have thrown when activating before deploying BEE");
   }
 
   function throwsWhenActivatingBeforeDeployingANT() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
     sale.activateSale();
   }
 
   function testCannotRedeployANT() {
     TestTokenPresale(throwProxy).throwsWhenRedeployingANT();
-    throwProxy.assertThrows("Should have thrown when redeploying ANT");
+    throwProxy.assertThrows("Should have thrown when redeploying BEE");
   }
 
   function throwsWhenRedeployingANT() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
     deployAndSetANT(sale);
     deployAndSetANT(sale);
   }
 
   function testOnlyMultisigCanDeployANT() {
     TestTokenPresale(throwProxy).throwsWhenNonMultisigDeploysANT();
-    throwProxy.assertThrows("Should have thrown when deploying ANT from not multisig");
+    throwProxy.assertThrows("Should have thrown when deploying BEE from not multisig");
   }
 
   function throwsWhenNonMultisigDeploysANT() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, 0x1, 0x3, 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, 0x1, 0x3, 3, 1, 2);
     deployAndSetANT(sale);
   }
 
@@ -84,10 +84,10 @@ contract TestTokenPresale {
   }
 
   function throwsWhenNetworkPlaceholderIsBad() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
-    sale.setANT(a, new ANPlaceholder(address(sale), address(sale)), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), address(sale))); // should be initialized with token address
+    sale.setANT(a, new ANPlaceholder(address(sale), address(sale)), new SaleWallet(sale.BeeDevMultisig(), sale.finalBlock(), address(sale))); // should be initialized with token address
   }
 
   function testThrowsIfSaleIsNotTokenController() {
@@ -96,10 +96,10 @@ contract TestTokenPresale {
   }
 
   function throwsWhenSaleIsNotTokenController() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BEE a = new BEE(new MiniMeTokenFactory());
     // Not called a.changeController(sale);
-    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), address(sale))); // should be initialized with token address
+    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.BeeDevMultisig(), sale.finalBlock(), address(sale))); // should be initialized with token address
   }
 
   function testThrowsSaleWalletIncorrectBlock() {
@@ -108,10 +108,10 @@ contract TestTokenPresale {
   }
 
   function throwsSaleWalletIncorrectBlock() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
-    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock() - 1, address(sale)));
+    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.BeeDevMultisig(), sale.finalBlock() - 1, address(sale)));
   }
 
   function testThrowsSaleWalletIncorrectMultisig() {
@@ -120,8 +120,8 @@ contract TestTokenPresale {
   }
 
   function throwsSaleWalletIncorrectMultisig() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
     sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(0x1a77ed, sale.finalBlock(), address(sale)));
   }
@@ -132,14 +132,14 @@ contract TestTokenPresale {
   }
 
   function throwsSaleWalletIncorrectSaleAddress() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
-    ANT a = new ANT(new MiniMeTokenFactory());
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BEE a = new BEE(new MiniMeTokenFactory());
     a.changeController(sale);
-    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.aragonDevMultisig(), sale.finalBlock(), 0xdead));
+    sale.setANT(a, new ANPlaceholder(address(sale), a), new SaleWallet(sale.BeeDevMultisig(), sale.finalBlock(), 0xdead));
   }
 
   function testSetPresaleTokens() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), 0x2, 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), 0x2, 3, 1, 2);
     deployAndSetANT(sale);
     sale.allocatePresaleTokens(0x1, 100 finney, uint64(now + 12 weeks), uint64(now + 24 weeks));
     sale.allocatePresaleTokens(0x2, 30 finney, uint64(now + 12 weeks), uint64(now + 24 weeks));
@@ -176,7 +176,7 @@ contract TestTokenPresale {
   }
 
   function throwIfSetPresaleTokensAfterActivation() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
     deployAndSetANT(sale);
     sale.activateSale(); // this is both multisigs
     sale.allocatePresaleTokens(0x1, 100, uint64(now + 12 weeks), uint64(now + 24 weeks));
@@ -188,7 +188,7 @@ contract TestTokenPresale {
   }
 
   function throwIfSetPresaleTokensAfterSaleStarts() {
-    AragonTokenSaleMock sale = new AragonTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
+    BeeTokenSaleMock sale = new BeeTokenSaleMock(10, 20, address(this), address(this), 3, 1, 2);
     deployAndSetANT(sale);
     sale.setMockedBlockNumber(13);
     sale.allocatePresaleTokens(0x1, 100, uint64(now + 12 weeks), uint64(now + 24 weeks));

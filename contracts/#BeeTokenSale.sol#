@@ -2,7 +2,7 @@ pragma solidity ^0.4.8;
 
 import "zeppelin/SafeMath.sol";
 import "./interface/Controller.sol";
-import "./ANT.sol";
+import "./BEE.sol";
 import "./ANPlaceholder.sol";
 import "./SaleWallet.sol";
 
@@ -16,12 +16,11 @@ import "./SaleWallet.sol";
 contract AragonTokenSale is Controller, SafeMath {
     uint public initialBlock;             // Block number in which the sale starts. Inclusive. sale will be opened at initial block.
     uint public finalBlock;               // Block number in which the sale end. Exclusive, sale will be closed at ends block.
-    uint public initialPrice;             // Number of wei-ANT tokens for 1 wei, at the start of the sale (18 decimals)
-    uint public finalPrice;               // Number of wei-ANT tokens for 1 wei, at the end of the sale
+    uint public initialPrice;             // Number of wei-BEE tokens for 1 wei, at the start of the sale (18 decimals)
+    uint public finalPrice;               // Number of wei-BEE tokens for 1 wei, at the end of the sale
     uint8 public priceStages;             // Number of different price stages for interpolating between initialPrice and finalPrice
     address public aragonDevMultisig;     // The address to hold the funds donated
     address public communityMultisig;     // Community trusted multisig to deploy network
-    bytes32 public capCommitment;
 
     uint public totalCollected = 0;               // In wei
     bool public saleStopped = false;              // Has Aragon Dev stopped the sale?
@@ -29,23 +28,21 @@ contract AragonTokenSale is Controller, SafeMath {
 
     mapping (address => bool) public activated;   // Address confirmates that wants to activate the sale
 
-    ANT public token;                             // The token
+    BEE public token;                             // The token
     ANPlaceholder public networkPlaceholder;      // The network placeholder
     SaleWallet public saleWallet;                    // Wallet that receives all sale funds
 
     uint constant public dust = 1 finney;         // Minimum investment
-    uint public hardCap = 1000000 ether;          // Hard cap to protect the ETH network from a really high raise
 
     event NewPresaleAllocation(address indexed holder, uint256 antAmount);
     event NewBuyer(address indexed holder, uint256 antAmount, uint256 etherAmount);
-    event CapRevealed(uint value, uint secret, address revealer);
 /// @dev There are several checks to make sure the parameters are acceptable
 /// @param _initialBlock The Block number in which the sale starts
 /// @param _finalBlock The Block number in which the sale ends
 /// @param _aragonDevMultisig The address that will store the donated funds and manager
 /// for the sale
-/// @param _initialPrice The price for the first stage of the sale. Price in wei-ANT per wei.
-/// @param _finalPrice The price for the final stage of the sale. Price in wei-ANT per wei.
+/// @param _initialPrice The price for the first stage of the sale. Price in wei-BEE per wei.
+/// @param _finalPrice The price for the final stage of the sale. Price in wei-BEE per wei.
 /// @param _priceStages The number of price stages. The price for every middle stage
 /// will be linearly interpolated.
 /*
@@ -80,7 +77,6 @@ Price increases by the same delta in every stage change
       uint256 _initialPrice,
       uint256 _finalPrice,
       uint8 _priceStages,
-      bytes32 _capCommitment
   )
       non_zero_address(_aragonDevMultisig)
       non_zero_address(_communityMultisig)
@@ -90,7 +86,6 @@ Price increases by the same delta in every stage change
       if (_initialPrice <= _finalPrice) throw;
       if (_priceStages < 2) throw;
       if (_priceStages > _initialPrice - _finalPrice) throw;
-      if (uint(_capCommitment) == 0) throw;
 
       // Save constructor arguments as global variables
       initialBlock = _initialBlock;
@@ -100,15 +95,14 @@ Price increases by the same delta in every stage change
       initialPrice = _initialPrice;
       finalPrice = _finalPrice;
       priceStages = _priceStages;
-      capCommitment = _capCommitment;
   }
 
-  // @notice Deploy ANT is called only once to setup all the needed contracts.
-  // @param _token: Address of an instance of the ANT token
+  // @notice Deploy BEE is called only once to setup all the needed contracts.
+  // @param _token: Address of an instance of the BEE token
   // @param _networkPlaceholder: Address of an instance of ANPlaceholder
   // @param _saleWallet: Address of the wallet receiving the funds of the sale
 
-  function setANT(address _token, address _networkPlaceholder, address _saleWallet)
+  function setBEE(address _token, address _networkPlaceholder, address _saleWallet)
            non_zero_address(_token)
            non_zero_address(_networkPlaceholder)
            non_zero_address(_saleWallet)
@@ -118,13 +112,13 @@ Price increases by the same delta in every stage change
     // Assert that the function hasn't been called before, as activate will happen at the end
     if (activated[this]) throw;
 
-    token = ANT(_token);
+    token = BEE(_token);
     networkPlaceholder = ANPlaceholder(_networkPlaceholder);
     saleWallet = SaleWallet(_saleWallet);
 
     if (token.controller() != address(this)) throw; // sale is controller
     if (networkPlaceholder.sale() != address(this)) throw; // placeholder has reference to Sale
-    if (networkPlaceholder.token() != address(token)) throw; // placeholder has reference to ANT
+    if (networkPlaceholder.token() != address(token)) throw; // placeholder has reference to BEE
     if (token.totalSupply() > 0) throw; // token is empty
     if (saleWallet.finalBlock() != finalBlock) throw; // final blocks must match
     if (saleWallet.multisig() != aragonDevMultisig) throw; // receiving wallet must match
@@ -155,9 +149,9 @@ Price increases by the same delta in every stage change
     return activated[this] && activated[aragonDevMultisig] && activated[communityMultisig];
   }
 
-  // @notice Get the price for a ANT token at any given block number
+  // @notice Get the price for a BEE token at any given block number
   // @param _blockNumber the block for which the price is requested
-  // @return Number of wei-ANT for 1 wei
+  // @return Number of wei-BEE for 1 wei
   // If sale isn't ongoing for that block, returns 0.
   function getPrice(uint _blockNumber) constant public returns (uint256) {
     if (_blockNumber < initialBlock || _blockNumber >= finalBlock) return 0;
@@ -200,7 +194,7 @@ Price increases by the same delta in every stage change
            only(aragonDevMultisig)
            public {
 
-    if (_amount > 10 ** 24) throw; // 1 million ANT. No presale partner will have more than this allocated. Prevent overflows.
+    if (_amount > 10 ** 24) throw; // 1 million BEE. No presale partner will have more than this allocated. Prevent overflows.
 
     if (!token.generateTokens(address(this), _amount)) throw;
     token.grantVestedTokens(_receiver, _amount, uint64(now), cliffDate, vestingDate);
@@ -208,6 +202,8 @@ Price increases by the same delta in every stage change
     NewPresaleAllocation(_receiver, _amount);
   }
 
+
+ADD REFUND MECHANISM
 /// @dev The fallback function is called when ether is sent to the contract, it
 /// simply calls `doPayment()` with the address that sent the ether as the
 /// `_owner`. Payable is a required solidity modifier for functions to receive
@@ -253,10 +249,11 @@ Price increases by the same delta in every stage change
     return false;
   }
 
+is the sale fails return everyones money  
+
 /// @dev `doPayment()` is an internal function that sends the ether that this
 ///  contract receives to the aragonDevMultisig and creates tokens in the address of the
 /// @param _owner The address that will hold the newly created tokens
-
   function doPayment(address _owner)
            only_during_sale_period
            only_sale_not_stopped
@@ -264,11 +261,17 @@ Price increases by the same delta in every stage change
            non_zero_address(_owner)
            minimum_value(dust)
            internal {
-
-    if (totalCollected + msg.value > hardCap) throw; // If past hard cap, throw
+    if (this.address.balance >= priceGoal__) {
+      // Doesn't check if saleStopped is false, because sale could end in a emergency stop.
+      // This function cannot be successfully called twice, because it will top being the controller,
+      // and the generateTokens call will fail if called again.
+      finalPrice = getPrice(getBlockNumber());  
+      saleFinalized = true;  // Set stop is true which will enable network deployment
+      saleStopped = true;
+    }
 
     if (!saleWallet.send(msg.value)) throw; // Send funds to multisig
-    eth4tokens[_owner] = msg.value;
+    eth4tokensError[_owner] = msg.value;
 
 
     totalCollected = safeAdd(totalCollected, msg.value); // Save total collected amount
@@ -299,39 +302,12 @@ Price increases by the same delta in every stage change
     saleStopped = false;
   }
 
-  function revealCap(uint256 _cap, uint256 _cap_secure)
-           only_during_sale_period
-           only_sale_activated
-           verify_cap(_cap, _cap_secure)
-           public {
-
-    if (_cap > hardCap) throw;
-
-    hardCap = _cap;
-    CapRevealed(_cap, _cap_secure, msg.sender);
-
-    if (totalCollected + dust >= hardCap) {
-      doFinalizeSale(_cap, _cap_secure);
-    }
-  }
-
-  // @notice Finalizes sale generating the tokens for Aragon Dev.
-  // @dev Transfers the token controller power to the ANPlaceholder.
-  function finalizeSale(uint256 _cap, uint256 _cap_secure)
-           only_after_sale
-           only(aragonDevMultisig)
-           public {
-
-    doFinalizeSale(_cap, _cap_secure);
-    finalPrice = getPrice(getBlockNumber());
-  }
-
-
   // for loop with bounded number of looping
   uint public finalPrice;
   uint private distributeFunds_state = 0;
   IndexedAddressSet contributors;
   mapping (address => uint) contributorAmount; // Amount contributed ether
+
   function distributeTokens(uint count) {
     if (!finalized) throw;
 
@@ -345,11 +321,11 @@ Price increases by the same delta in every stage change
       _owner = contributors.get(contribIndex);
       etherDonated = contributorAmount(_owner);
       boughtTokens = safeMul(etherDonated, finalPrice); // Calculate how many tokens bought
-
-      if (!token.generateTokens(_owner, boughtTokens)) throw; // Allocate tokens. This will fail after sale is finalized in case it is hidden cap finalized.
+      if (!token.generateTokens(_owner, boughtTokens)) throw; 
     }
     distributeFunds_state = contribIndex;
 
+    // After all tokens have been distributed
     if (contribIndex >= contributors.length) {
       // Aragon Dev owns 30% of the total number of emitted tokens at the end of the sale.
       uint256 aragonTokens = token.totalSupply() * 3 / 7;
@@ -358,21 +334,6 @@ Price increases by the same delta in every stage change
     }
   }
 
-  function doFinalizeSale(uint256 _cap, uint256 _cap_secure)
-           verify_cap(_cap, _cap_secure)
-           internal {
-    // Doesn't check if saleStopped is false, because sale could end in a emergency stop.
-    // This function cannot be successfully called twice, because it will top being the controller,
-    // and the generateTokens call will fail if called again.
-
-    // Generate the tokens
-
-    // Iterate over owners
-
-    
-    saleFinalized = true;  // Set stop is true which will enable network deployment
-    saleStopped = true;
-  }
 
   // @notice Deploy Aragon Network contract.
   // @param networkAddress: The address the network was deployed at.
@@ -405,23 +366,12 @@ Price increases by the same delta in every stage change
     return block.number;
   }
 
-  function computeCap(uint256 _cap, uint256 _cap_secure) constant public returns (bytes32) {
-    return sha3(_cap, _cap_secure);
-  }
-
-  function isValidCap(uint256 _cap, uint256 _cap_secure) constant public returns (bool) {
-    return computeCap(_cap, _cap_secure) == capCommitment;
-  }
 
   modifier only(address x) {
     if (msg.sender != x) throw;
     _;
   }
 
-  modifier verify_cap(uint256 _cap, uint256 _cap_secure) {
-    if (!isValidCap(_cap, _cap_secure)) throw;
-    _;
-  }
 
   modifier only_before_sale {
     if (getBlockNumber() >= initialBlock) throw;

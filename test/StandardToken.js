@@ -2,14 +2,14 @@
 
 const assertJump = require('./helpers/assertJump');
 const assertGas = require('./helpers/assertGas');
-var AragonTokenSaleTokenMock = artifacts.require("AragonTokenSaleTokenMock");
+var BeeTokenSaleTokenMock = artifacts.require("BeeTokenSaleTokenMock");
 var TokenReceiverMock = artifacts.require("TokenReceiverMock");
 var StandardToken = artifacts.require("MiniMeToken.sol");
 
 contract('StandardToken', function(accounts) {
   let token;
   beforeEach(async () => {
-    const sale = await AragonTokenSaleTokenMock.new(accounts[0], 70) // 30 extra tokens are 30% extra at sale end
+    const sale = await BeeTokenSaleTokenMock.new(accounts[0], 70) // 30 extra tokens are 30% extra at sale end
     token = StandardToken.at(await sale.token())
   })
 

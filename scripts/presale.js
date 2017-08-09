@@ -41,7 +41,7 @@ module.exports = function (callback) {
 
     const data = tx.params[0].data
 
-    console.log(`Assigning ${address} ${antAmount} ANT (${wantAmount} wANT). Cliff ${formatDate(cliff)} (${cliff}) Vesting ${formatDate(vesting)} (${vesting})\n${data}`)
+    console.log(`Assigning ${address} ${antAmount} BEE (${wantAmount} wANT). Cliff ${formatDate(cliff)} (${cliff}) Vesting ${formatDate(vesting)} (${vesting})\n${data}`)
 
     return MultiSigWallet
       .at(multisigAddress)

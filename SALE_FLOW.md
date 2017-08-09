@@ -1,4 +1,4 @@
-# ANT Initial Sale flow
+# BEE Initial Sale flow
 
 Example of a successful testnet sale: https://kovan.etherscan.io/address/0x506E1db7DA1B3876eAcd2EdDf6ED551A7F2787D0
 
@@ -17,10 +17,10 @@ Aragon token sale will be deployed 1 week prior to the beginning of the sale wit
 - Cap commitment: sealed commitment for the soft hidden cap.
 
 #### 2. sale.setANT() – 95,427 gas
-Set ANT needs to called from the Aragon Multisig. Its parameters are:
+Set BEE needs to called from the Aragon Multisig. Its parameters are:
 
-- ANT token address: An empty deployed instance of ANT.
-- ANPlaceholder: A network placeholder with references to the Sale and ANT.
+- BEE token address: An empty deployed instance of BEE.
+- ANPlaceholder: A network placeholder with references to the Sale and BEE.
 - Sale wallet: A contract that holds sale funds until final block.
 
 Aragon Dev will perform setANT inmediately after deploying the sale so it is instantiated as soon as possible.
@@ -90,7 +90,7 @@ The after sale period is considered from the final block (inclusive) until the s
 
 #### 9. sale.finalizeSale() – 105,348 gas
 
-This method will mint an additional 3/7 of tokens so at the end of the sale Aragon Dev will own 30% of all the ANT supply.
+This method will mint an additional 3/7 of tokens so at the end of the sale Aragon Dev will own 30% of all the BEE supply.
 
 In the process of doing so, it will make the ANPlaceholder the controller of the token contract. Which will make the token supply be constant until the network is deployed and it implements a new minting policy.
 
