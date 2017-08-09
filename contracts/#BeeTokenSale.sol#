@@ -202,6 +202,8 @@ Price increases by the same delta in every stage change
     NewPresaleAllocation(_receiver, _amount);
   }
 
+
+ADD REFUND MECHANISM
 /// @dev The fallback function is called when ether is sent to the contract, it
 /// simply calls `doPayment()` with the address that sent the ether as the
 /// `_owner`. Payable is a required solidity modifier for functions to receive
@@ -323,6 +325,7 @@ is the sale fails return everyones money
     }
     distributeFunds_state = contribIndex;
 
+    // After all tokens have been distributed
     if (contribIndex >= contributors.length) {
       // Aragon Dev owns 30% of the total number of emitted tokens at the end of the sale.
       uint256 aragonTokens = token.totalSupply() * 3 / 7;
