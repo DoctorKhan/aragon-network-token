@@ -34,6 +34,27 @@ class App extends Component {
     })
   }
 
+  // Approves sale before it starts
+  approveSale(e) {
+    e.preventDefault();
+
+    this.state.web3.eth.getAccounts(async (e, accounts) => {
+      const aragonMs =    accounts[0];
+      const communityMs = accounts[1];
+      const tokenAddr = token.address();  // BEE token
+      const networkPlaceholderAddr = .address();  // BEEPlaceholder
+      const saleWaleAddr = .address();  // SaleWallet
+
+      tokenSale.activateSale({from: aragonMs});      // Setup aragon multisig
+      tokenSale.activateSale({from: communityMs});   // Setup community multisig
+      
+      tokenSale.setAnt( tokenAddr                    // Final sale approval
+                      , networkPlaceholderAddr, saleWaleAddr, {from: aragonMs});
+      
+    })
+    
+  }
+
   buyTokens(e) {
     e.preventDefault();
 

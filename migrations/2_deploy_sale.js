@@ -8,14 +8,14 @@ var SaleWallet = artifacts.require("SaleWallet");
 module.exports = function(deployer, network, accounts) {
   if (network.indexOf('dev') > -1) return // dont deploy on tests
 
-  const aragonMs =    '0xcafE1A77e84698c83CA8931F54A755176eF75f2C'
-  const communityMs = '0xbEEFbEeF03c7E5a1C29E0Aa675f8E16AEe0A5FAd'
+  const aragonMs =    accounts[0]
+  const communityMs = accounts[1]
 
   const initialBlock = 3723000
   const finalBlock =   3881000
 
   deployer.deploy(MiniMeTokenFactory);
-  deployer.deploy(AragonTokenSale, initialBlock, finalBlock, aragonMs, communityMs, 100, 66, 2, '0x663fae46b5b6ef5cc01783af56194e693b71fe529ac917716e460f18f86742b6')
+  deployer.deploy(AragonTokenSale, initialBlock, finalBlock, aragonMs, communityMs, 100, 66)
     .then(() => {
       return MiniMeTokenFactory.deployed()
         .then(f => {
